@@ -99,6 +99,8 @@ app.get('/webhook', (req, res) => {
     }
   }
 });
+// lets count user's messages
+let countMap = new Map();
 
 function handleMessage(sender_psid, received_message) {
   let response;
@@ -107,9 +109,17 @@ function handleMessage(sender_psid, received_message) {
   if (received_message.text) {    
     // Create the payload for a basic text message, which
     // will be added to the body of our request to the Send API
-    response = {
-      "text": `You sent the message: "${received_message.text}". Now send me an attachment!`
+    let userage = 'new'; let ntimes = 1;
+    if(countMap.has(sender_psid)){
+      userage = 'return';
+      ntimes = countMap.get(sender_psid) + 1;
+      countMap.set(sender_psid, ntimes);
     }
+    countMap.set(sender_psid, ntimes);
+    response = {
+      "text": `Welcome ${userage} user, this is your message #${ntimes} : "${received_message.text}". Now send me an attachment!`
+    }
+    console.log(response)
   } else if (received_message.attachments) {
     // Get the URL of the message attachment
     let attachment_url = received_message.attachments[0].payload.url;
