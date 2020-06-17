@@ -29,7 +29,31 @@ const
   body_parser = require('body-parser'),
   app = express().use(body_parser.json()); // creates express http server
 
-// Sets server port and logs message on success
+// Setup postgres connection
+// const { Client } = require('pg');
+
+// const client = new Client({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: {
+//     rejectUnauthorized: false
+//   }
+// });
+
+// client.connect();
+
+// client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+//   if (err) throw err;
+//   for (let row of res.rows) {
+//     console.log(JSON.stringify(row));
+//   }
+//   client.end();
+// });
+
+// Using sequelize 
+const db = require('./models/index.js');
+const users = require('./models/users.js');
+
+  // Sets server port and logs message on success
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 // Accepts POST requests at /webhook endpoint
@@ -99,8 +123,25 @@ app.get('/webhook', (req, res) => {
     }
   }
 });
-// lets count user's messages
-let countMap = new Map();
+
+// check if user exists
+
+function userExists(sender_psid) {
+  db.Users.findOne({ where: {fbid: sender_psid} }).then(function(userobj){
+    if(userobj){
+      console.log('user exists');
+      return 1;
+    }else{
+      console.log('user is new');
+      return 0;
+    } 
+  })
+}
+
+function createUser(sender_psid, userName, userLocation) {
+  console.log('Create User is executed')
+  db.Users.create({ name: userName, fbid: sender_psid, location : userLocation })
+}
 
 function handleMessage(sender_psid, received_message) {
   let response;
@@ -109,17 +150,23 @@ function handleMessage(sender_psid, received_message) {
   if (received_message.text) {    
     // Create the payload for a basic text message, which
     // will be added to the body of our request to the Send API
-    let userage = 'new'; let ntimes = 1;
-    if(countMap.has(sender_psid)){
-      userage = 'return';
-      ntimes = countMap.get(sender_psid) + 1;
-      countMap.set(sender_psid, ntimes);
+    
+    // check if user exists
+    if(userExists(sender_psid) == 0){
+      // create new user with some registration flows
+      createUser(sender_psid, 'user' + sender_psid, 'Earth');
+      response = {
+        "text": `Welcome new user, this is your message: "${received_message.text}". Now send me an attachment!`
+      }
+    }else{
+      // greet existing user or just handle user's message
+      console.log("Existing User command");
+      response = {
+        "text": `Welcome existing user, this is your message : "${received_message.text}" at location . Now send me an attachment!`
+      }
     }
-    countMap.set(sender_psid, ntimes);
-    response = {
-      "text": `Welcome ${userage} user, this is your message #${ntimes} : "${received_message.text}". Now send me an attachment!`
-    }
-    console.log(response)
+
+    console.log(response);
   } else if (received_message.attachments) {
     // Get the URL of the message attachment
     let attachment_url = received_message.attachments[0].payload.url;

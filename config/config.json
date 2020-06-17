@@ -1,0 +1,19 @@
+{
+  "development": {
+    "username": "suds",
+    "password": "sudspass",
+    "database": "slotsdb",
+    "host": "localhost",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "production": {
+    "username": "suds",
+    "password": "password",
+    "database": "urlshortener_production",
+    "host": "localhost",
+    "dialect": "postgres",
+    "operatorsAliases": false,
+    "use_env_variable": "DATABASE_URL"
+  }
+}

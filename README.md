@@ -43,3 +43,7 @@ With this application/json content  :
   ]
 }
 
+# Creating local postgres
+
+I'm following this https://stackabuse.com/adding-a-postgresql-database-to-a-node-js-app-on-heroku/
+
