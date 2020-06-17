@@ -9,4 +9,4 @@ curl -X GET "https://fbslots.herokuapp.com/webhook?hub.verify_token=iKCjToP5gL&h
 
 # Error FAQ 
 
-If you get the error, "Error: Cannot find module 'request'", run `Error: Cannot find module 'request'`
+If you get the error, "Error: Cannot find module 'request'", run `npm install request --save`
