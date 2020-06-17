@@ -9,8 +9,8 @@
   },
   "production": {
     "username": "suds",
-    "password": "password",
-    "database": "urlshortener_production",
+    "password": "sudspass",
+    "database": "slotsdb",
     "host": "localhost",
     "dialect": "postgres",
     "operatorsAliases": false,

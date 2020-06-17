@@ -130,10 +130,10 @@ function userExists(sender_psid) {
   db.Users.findOne({ where: {fbid: sender_psid} }).then(function(userobj){
     if(userobj){
       console.log('user exists');
-      return 1;
+      return true;
     }else{
       console.log('user is new');
-      return 0;
+      return false;
     } 
   })
 }
@@ -152,7 +152,7 @@ function handleMessage(sender_psid, received_message) {
     // will be added to the body of our request to the Send API
     
     // check if user exists
-    if(userExists(sender_psid) == 0){
+    if(userExists(sender_psid) === false){
       // create new user with some registration flows
       createUser(sender_psid, 'user' + sender_psid, 'Earth');
       response = {
