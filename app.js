@@ -127,15 +127,17 @@ app.get('/webhook', (req, res) => {
 // check if user exists
 
 function userExists(sender_psid) {
-  db.Users.findOne({ where: {fbid: sender_psid} }).then(function(userobj){
+  let userBool;
+  userBool = db.Users.findOne({ where: {fbid: sender_psid} }).then(function(userobj){
     if(userobj){
-      console.log('user exists');
+      console.log('user OBJ exists');
       return true;
     }else{
-      console.log('user is new');
+      console.log('user OBJ does not exist, user is new');
       return false;
     } 
-  })
+  });
+  return userBool; //!! I want this to return true or false
 }
 
 function createUser(sender_psid, userName, userLocation) {
@@ -152,22 +154,35 @@ function handleMessage(sender_psid, received_message) {
     // will be added to the body of our request to the Send API
     
     // check if user exists
-    if(userExists(sender_psid) === false){
-      // create new user with some registration flows
-      createUser(sender_psid, 'user' + sender_psid, 'Earth');
-      response = {
-        "text": `Welcome new user, this is your message: "${received_message.text}". Now send me an attachment!`
+    let existBool = userExists(sender_psid);
+    existBool.then(function(){
+      let response;
+      //set response
+      // !! 
+      console.log(existBool)
+      console.log('exist bool is = ' + existBool)
+      // !! existBool is still a promise object, I cannot extract true or false values from this.
+      if(existBool === false){
+        // create new user with some registration flows
+        createUser(sender_psid, 'user' + sender_psid, 'Earth');
+        response = {
+          "text": `Welcome new user, this is your message: "${received_message.text}". Now send me an attachment!`
+        }
+      }else{
+        // greet existing user or just handle user's message
+        console.log("Existing User command");
+        response = {
+          "text": `Welcome existing user, this is your message : "${received_message.text}" at location . Now send me an attachment!`
+        }
       }
-    }else{
-      // greet existing user or just handle user's message
-      console.log("Existing User command");
-      response = {
-        "text": `Welcome existing user, this is your message : "${received_message.text}" at location . Now send me an attachment!`
-      }
-    }
 
-    console.log(response);
+      console.log(response);
+      // Send the response message
+      callSendAPI(sender_psid, response); 
+    })
+    
   } else if (received_message.attachments) {
+    let response;
     // Get the URL of the message attachment
     let attachment_url = received_message.attachments[0].payload.url;
     response = {
@@ -195,10 +210,10 @@ function handleMessage(sender_psid, received_message) {
         }
       }
     }
+    // Send the response message
+    callSendAPI(sender_psid, response);
   } 
-  
-  // Send the response message
-  callSendAPI(sender_psid, response);    
+     
 }
 
 function handlePostback(sender_psid, received_postback) {
