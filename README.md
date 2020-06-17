@@ -9,7 +9,6 @@ https://fbslots.herokuapp.com/
 
 curl -X GET "https://fbslots.herokuapp.com/webhook?hub.verify_token=iKCjToP5gL&hub.challenge=CHALLENGE_ACCEPTED&hub.mode=subscribe"
 
-
 # Sending a message  : 
 
 
@@ -47,3 +46,6 @@ With this application/json content  :
 
 I'm following this https://stackabuse.com/adding-a-postgresql-database-to-a-node-js-app-on-heroku/
 
+# Error FAQ 
+
+If you get the error, "Error: Cannot find module 'request'", run `npm install request --save`
