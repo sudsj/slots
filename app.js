@@ -124,22 +124,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// check if user exists
-
-function userExists(sender_psid) {
-  let userBool;
-  userBool = db.Users.findOne({ where: {fbid: sender_psid} }).then(function(userobj){
-    if(userobj){
-      console.log('user OBJ exists');
-      return true;
-    }else{
-      console.log('user OBJ does not exist, user is new');
-      return false;
-    } 
-  });
-  return userBool; //!! I want this to return true or false
-}
-
 function userFlow(sender_psid, received_message) {
   // handles the async db call to check if user exists and replies accordingly.
   db.Users.findOne({ where: {fbid: sender_psid} }).then(user => {
@@ -167,6 +151,7 @@ function userFlow(sender_psid, received_message) {
 }
 
 function createUser(sender_psid, userName, userLocation) {
+  // creates a new user entry in the DB, Users Table
   console.log('Create User is executed')
   db.Users.create({ name: userName, fbid: sender_psid, location : userLocation })
 }
@@ -293,7 +278,7 @@ function receivedMessage(event) {
     if (messageText) {
         var msg = "Hi ,I'm LocationBot ,and I was created to echo back your latitude and longitude coordinates "+
                   "You just need to send me your location  \n" + 
-                  "Using the send location button on messenger (only available on mobile devices) \n"+
+                  "Using the send location button on messenger (only available on mobile devices) \n"
 
         switch (messageText) { 
             case 'getstarted' :
