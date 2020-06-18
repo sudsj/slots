@@ -255,3 +255,64 @@ function callSendAPI(sender_psid, response) {
     }
   }); 
 }
+
+app.post('/webhook', function (req, res) {
+var data = req.body;
+
+// Make sure this is a page subscription
+if (data.object === 'page') {
+
+    // Iterate over each entry - there may be multiple if batched
+    data.entry.forEach(function(entry) {
+    var pageID = entry.id;
+    var timeOfEvent = entry.time;
+
+    // Iterate over each messaging event
+    entry.messaging.forEach(function(event) {
+        if (event.message) {
+        receivedMessage(event);
+        } else {
+        console.log("Webhook received unknown event: ", event);
+        }
+    });
+    });
+
+    res.sendStatus(200);
+}
+});
+
+function receivedMessage(event) {
+    var senderID = event.sender.id;
+    var recipientID = event.recipient.id;
+    var timeOfMessage = event.timestamp;
+    var message = event.message;
+    var messageId = message.mid;
+    var messageText = message.text;
+    var messageAttachments = message.attachments;
+    if (messageText) {
+        var msg = "Hi ,I'm LocationBot ,and I was created to echo back your latitude and longitude coordinates "+
+                  "You just need to send me your location  \n" + 
+                  "Using the send location button on messenger (only available on mobile devices) \n"+
+
+        switch (messageText) { 
+            case 'getstarted' :
+                sendTextMessage(senderID, msg);   
+            default:
+                sendTextMessage(senderID, msg);
+        }
+
+    } else if (messageAttachments) {
+            var lat = null;
+            var long = null;
+            if(messageAttachments[0].payload.coordinates)
+            {
+                lat = messageAttachments[0].payload.coordinates.lat;
+                long = messageAttachments[0].payload.coordinates.long;
+            }
+
+            var msg = "lat : " + lat + " ,long : " + long + "\n";
+
+            sendTextMessage(senderID, msg);
+
+        }
+}
