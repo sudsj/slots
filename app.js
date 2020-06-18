@@ -140,6 +140,32 @@ function userExists(sender_psid) {
   return userBool; //!! I want this to return true or false
 }
 
+function userFlow(sender_psid, received_message) {
+  // handles the async db call to check if user exists and replies accordingly.
+  db.Users.findOne({ where: {fbid: sender_psid} }).then(user => {
+    // console.log(user.fbid);
+    // console.log(received_message);
+    let response;
+    if(user){
+      console.log('existing user');
+      response = {
+        "text": `Welcome again ${user.name} from ${user.location}, this is your message: "${received_message.text}".`
+      }
+    }else{
+      console.log('new user');
+      response = {
+        "text": `Welcome new user, Please register`
+      }
+      // Insert user registeration functions/logic here
+      createUser(sender_psid, 'user'+ sender_psid, 'Earth');
+    }
+
+    console.log(response);
+    // Send the response message
+    callSendAPI(sender_psid, response);
+  })
+}
+
 function createUser(sender_psid, userName, userLocation) {
   console.log('Create User is executed')
   db.Users.create({ name: userName, fbid: sender_psid, location : userLocation })
@@ -153,33 +179,8 @@ function handleMessage(sender_psid, received_message) {
     // Create the payload for a basic text message, which
     // will be added to the body of our request to the Send API
     
-    // check if user exists
-    let existBool = userExists(sender_psid);
-    existBool.then(function(){
-      let response;
-      //set response
-      // !! 
-      console.log(existBool)
-      console.log('exist bool is = ' + existBool)
-      // !! existBool is still a promise object, I cannot extract true or false values from this.
-      if(existBool === false){
-        // create new user with some registration flows
-        createUser(sender_psid, 'user' + sender_psid, 'Earth');
-        response = {
-          "text": `Welcome new user, this is your message: "${received_message.text}". Now send me an attachment!`
-        }
-      }else{
-        // greet existing user or just handle user's message
-        console.log("Existing User command");
-        response = {
-          "text": `Welcome existing user, this is your message : "${received_message.text}" at location . Now send me an attachment!`
-        }
-      }
-
-      console.log(response);
-      // Send the response message
-      callSendAPI(sender_psid, response); 
-    })
+    // check if user exists and continue message flow
+    userFlow(sender_psid, received_message);
     
   } else if (received_message.attachments) {
     let response;
