@@ -111,7 +111,7 @@ function userFlow(sender_psid, received_message) {
       }else if(qpay === 'fmor'){
         fmor += 1;
         response = {
-          "text": `Thank you for choosing the morning slot at the Flower Shop. We expect ${fmor} visitors for that slot. Stay Safe!".`
+          "text": `Thank you for choosing the morning slot at the Flower Shop. We expect ${fmor} visitors for that slot. Stay Safe!.`
         }
         // Send the response message
         console.log(response);
@@ -119,7 +119,7 @@ function userFlow(sender_psid, received_message) {
       }else if(qpay === 'faft'){
         faft += 1;
         response = {
-          "text": `Thank you for choosing the afternoon slot at the Flower Shop. We expect ${faft} visitors for that slot. Stay Safe!".`
+          "text": `Thank you for choosing the afternoon slot at the Flower Shop. We expect ${faft} visitors for that slot. Stay Safe!.`
         }
         // Send the response message
         console.log(response);
@@ -127,7 +127,7 @@ function userFlow(sender_psid, received_message) {
       }else if(qpay === 'amor'){
         amor += 1;
         response = {
-          "text": `Thank you for choosing the morning slot at the Art Shop. We expect ${amor} visitors for that slot. Stay Safe!".`
+          "text": `Thank you for choosing the morning slot at the Art Shop. We expect ${amor} visitors for that slot. Stay Safe!.`
         }
         // Send the response message
         console.log(response);
@@ -135,7 +135,7 @@ function userFlow(sender_psid, received_message) {
       }else if(qpay === 'aaft'){
         aaft += 1;
         response = {
-          "text": `Thank you for choosing the afternoon slot at the Art Shop. We expect ${aaft} visitors for that slot. Stay Safe!".`
+          "text": `Thank you for choosing the afternoon slot at the Art Shop. We expect ${aaft} visitors for that slot. Stay Safe!.`
         }
         // Send the response message
         console.log(response);
