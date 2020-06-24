@@ -83,7 +83,7 @@ app.get('/webhook', (req, res) => {
     }
   }
 });
-
+var fmor = 0, faft = 0, amor = 0, aaft = 0;
 function userFlow(sender_psid, received_message) {
   // handles the async db call to check if user exists and replies accordingly.
   db.Users.findOne({ where: {fbid: sender_psid} }).then(user => {
@@ -97,13 +97,50 @@ function userFlow(sender_psid, received_message) {
         // call location handler
         console.log('location handler is called');
         locationHandler(sender_psid, received_message);
-      }else{
+      }else if(msgtxt === 'flower'){
+        showFlower(sender_psid);
+      }else if(msgtxt === 'art'){
+        showArt(sender_psid);
+      }else if(msgtxt === 'fmor'){
+        fmor += 1;
         response = {
-          "text": `Welcome again ${user.name} from ${user.location}, this is your message: "${received_message.text}".`
+          "text": `Thank you for choosing the morning slot at the Flower Shop. We expect ${fmor} visitors for that slot. Stay Safe!".`
         }
         // Send the response message
         console.log(response);
         callSendAPI(sender_psid, response);
+      }else if(msgtxt === 'faft'){
+        faft += 1;
+        response = {
+          "text": `Thank you for choosing the afternoon slot at the Flower Shop. We expect ${faft} visitors for that slot. Stay Safe!".`
+        }
+        // Send the response message
+        console.log(response);
+        callSendAPI(sender_psid, response);
+      }else if(msgtxt === 'amor'){
+        amor += 1;
+        response = {
+          "text": `Thank you for choosing the morning slot at the Art Shop. We expect ${amor} visitors for that slot. Stay Safe!".`
+        }
+        // Send the response message
+        console.log(response);
+        callSendAPI(sender_psid, response);
+      }else if(msgtxt === 'aaft'){
+        aaft += 1;
+        response = {
+          "text": `Thank you for choosing the afternoon slot at the Art Shop. We expect ${aaft} visitors for that slot. Stay Safe!".`
+        }
+        // Send the response message
+        console.log(response);
+        callSendAPI(sender_psid, response);
+      }else{
+        // response = {
+        //   "text": `Welcome again ${user.name} from ${user.location}, this is your message: "${received_message.text}".`
+        // }
+        // // Send the response message
+        // console.log(response);
+        // callSendAPI(sender_psid, response);
+        shopDisplay(sender_psid);
       }
       
     }else{
@@ -123,6 +160,60 @@ function userFlow(sender_psid, received_message) {
   })
 }
 
+function showFlower(sender_psid){
+  let response = {
+    "text": "Select a Slot",
+    "quick_replies":[
+      {
+        "content_type":"text",
+        "title":"Morning, visitors = " + fmor.toString(),
+        "payload":"fmor"
+      },{
+        "content_type":"text",
+        "title":"Afternoon, visitors = " + faft.toString(),
+        "payload":"faft"
+      }
+    ]
+  }
+  console.log(response);
+  callSendAPI(sender_psid, response);
+}
+function showArt(sender_psid){
+  let response = {
+    "text": "Select a Slot",
+    "quick_replies":[
+      {
+        "content_type":"text",
+        "title":"Morning, visitors = " + amor.toString(),
+        "payload":"amor"
+      },{
+        "content_type":"text",
+        "title":"Afternoon, visitors = " + aaft.toString(),
+        "payload":"aaft"
+      }
+    ]
+  }
+  console.log(response);
+  callSendAPI(sender_psid, response);
+}
+function shopDisplay(sender_psid){
+  let response = {
+    "text": "Select a Shop",
+    "quick_replies":[
+      {
+        "content_type":"text",
+        "title":"Flower Shop",
+        "payload":"flower"
+      },{
+        "content_type":"text",
+        "title":"Arts Shop",
+        "payload":"art"
+      }
+    ]
+  }
+  console.log(response);
+  callSendAPI(sender_psid, response);
+}
 function getLocation(){
   // Iterate over each entry - there may be multiple if batched
   data.entry.forEach(function(entry) {
@@ -151,47 +242,6 @@ function createUser(sender_psid, userName, userLocation) {
 function handleMessage(sender_psid, received_message) {
   let response;
   userFlow(sender_psid, received_message);
-  // Checks if the message contains text
-  // if (received_message.text) {    
-  //   // Create the payload for a basic text message, which
-  //   // will be added to the body of our request to the Send API
-    
-  //   // check if user exists and continue message flow
-  //   userFlow(sender_psid, received_message);
-    
-  // } else if (received_message.attachments) {
-  //   let response;
-  //   // Get the URL of the message attachment
-  //   let attachment_url = received_message.attachments[0].payload.url;
-  //   response = {
-  //     "attachment": {
-  //       "type": "template",
-  //       "payload": {
-  //         "template_type": "generic",
-  //         "elements": [{
-  //           "title": "Is this the right picture?",
-  //           "subtitle": "Tap a button to answer.",
-  //           "image_url": attachment_url,
-  //           "buttons": [
-  //             {
-  //               "type": "postback",
-  //               "title": "Yes!",
-  //               "payload": "yes",
-  //             },
-  //             {
-  //               "type": "postback",
-  //               "title": "No!",
-  //               "payload": "no",
-  //             }
-  //           ],
-  //         }]
-  //       }
-  //     }
-  //   }
-  //   // Send the response message
-  //   callSendAPI(sender_psid, response);
-  // } 
-     
 }
 
 function handlePostback(sender_psid, received_postback) {
@@ -218,7 +268,8 @@ function callSendAPI(sender_psid, response) {
     },
     "message": response
   }
-
+  // logging
+  console.log(response);
   // Send the HTTP request to the Messenger Platform
   request({
     "uri": "https://graph.facebook.com/v2.6/me/messages",
