@@ -86,6 +86,7 @@ app.get('/webhook', (req, res) => {
 var fmor = 0, faft = 0, amor = 0, aaft = 0;
 function userFlow(sender_psid, received_message) {
   // handles the async db call to check if user exists and replies accordingly.
+  console.log(received_message)
   db.Users.findOne({ where: {fbid: sender_psid} }).then(user => {
     // console.log(user.fbid);
     // console.log(received_message);
