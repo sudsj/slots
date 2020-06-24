@@ -94,7 +94,12 @@ function userFlow(sender_psid, received_message) {
     if(user){
       console.log('existing user');
       var msgtxt = received_message.text.trim();
-      var qpay = received_message.quick_reply.payload;
+      var qpay = "not there";
+      if(received_message.quick_reply){
+        if(received_message.quick_reply.payload){
+          qpay = received_message.quick_reply.payload;
+        }
+      }
       if(msgtxt === 'location'){
         // call location handler
         console.log('location handler is called');
