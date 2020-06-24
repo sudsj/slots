@@ -168,11 +168,11 @@ function showFlower(sender_psid){
     "quick_replies":[
       {
         "content_type":"text",
-        "title":"Morning, visitors = " + fmor.toString(),
+        "title":"Morning, vis = " + fmor.toString(),
         "payload":"fmor"
       },{
         "content_type":"text",
-        "title":"Afternoon, visitors = " + faft.toString(),
+        "title":"Afternoon, vis = " + faft.toString(),
         "payload":"faft"
       }
     ]
@@ -186,11 +186,11 @@ function showArt(sender_psid){
     "quick_replies":[
       {
         "content_type":"text",
-        "title":"Morning, visitors = " + amor.toString(),
+        "title":"Morning, vis = " + amor.toString(),
         "payload":"amor"
       },{
         "content_type":"text",
-        "title":"Afternoon, visitors = " + aaft.toString(),
+        "title":"Afternoon, vis = " + aaft.toString(),
         "payload":"aaft"
       }
     ]
