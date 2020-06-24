@@ -94,15 +94,16 @@ function userFlow(sender_psid, received_message) {
     if(user){
       console.log('existing user');
       var msgtxt = received_message.text.trim();
+      var qpay = received_message.quick_reply.payload;
       if(msgtxt === 'location'){
         // call location handler
         console.log('location handler is called');
         locationHandler(sender_psid, received_message);
-      }else if(msgtxt === 'flower'){
+      }else if(qpay === 'flower'){
         showFlower(sender_psid);
-      }else if(msgtxt === 'art'){
+      }else if(qpay === 'art'){
         showArt(sender_psid);
-      }else if(msgtxt === 'fmor'){
+      }else if(qpay === 'fmor'){
         fmor += 1;
         response = {
           "text": `Thank you for choosing the morning slot at the Flower Shop. We expect ${fmor} visitors for that slot. Stay Safe!".`
@@ -110,7 +111,7 @@ function userFlow(sender_psid, received_message) {
         // Send the response message
         console.log(response);
         callSendAPI(sender_psid, response);
-      }else if(msgtxt === 'faft'){
+      }else if(qpay === 'faft'){
         faft += 1;
         response = {
           "text": `Thank you for choosing the afternoon slot at the Flower Shop. We expect ${faft} visitors for that slot. Stay Safe!".`
@@ -118,7 +119,7 @@ function userFlow(sender_psid, received_message) {
         // Send the response message
         console.log(response);
         callSendAPI(sender_psid, response);
-      }else if(msgtxt === 'amor'){
+      }else if(qpay === 'amor'){
         amor += 1;
         response = {
           "text": `Thank you for choosing the morning slot at the Art Shop. We expect ${amor} visitors for that slot. Stay Safe!".`
@@ -126,7 +127,7 @@ function userFlow(sender_psid, received_message) {
         // Send the response message
         console.log(response);
         callSendAPI(sender_psid, response);
-      }else if(msgtxt === 'aaft'){
+      }else if(qpay === 'aaft'){
         aaft += 1;
         response = {
           "text": `Thank you for choosing the afternoon slot at the Art Shop. We expect ${aaft} visitors for that slot. Stay Safe!".`
