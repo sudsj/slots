@@ -148,7 +148,7 @@ function userFlow(sender_psid, received_message) {
     }else{
       console.log('new user');
       response = {
-        "text": `Welcome new user, Please register`
+        "text": `Welcome new user, We help you reserve a slot to visit your favourite shops. We show expected visitor counts so you can make an informed decision and stay safe while ensuring Social Distancing.`
       }
       // Insert user registeration functions/logic here
       createUser(sender_psid, 'user'+ sender_psid, 'Earth');
