@@ -1,25 +1,3 @@
-
-/**
- * Copyright 2017-present, Facebook, Inc. All rights reserved.
- *
- * This source code is licensed under the license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * Messenger Platform Quick Start Tutorial
- *
- * This is the completed code for the Messenger Platform quick start tutorial
- *
- * https://developers.facebook.com/docs/messenger-platform/getting-started/quick-start/
- *
- * To run this code, you must do the following:
- *
- * 1. Deploy this code to a server running Node.js
- * 2. Run `npm install`
- * 3. Update the VERIFY_TOKEN
- * 4. Add your PAGE_ACCESS_TOKEN to your environment vars
- *
- */
-
 'use strict';
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const GOOGLE_GEOCODING_API = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
@@ -30,26 +8,6 @@ const
   express = require('express'),
   body_parser = require('body-parser'),
   app = express().use(body_parser.json()); // creates express http server
-
-// Setup postgres connection
-// const { Client } = require('pg');
-
-// const client = new Client({
-//   connectionString: process.env.DATABASE_URL,
-//   ssl: {
-//     rejectUnauthorized: false
-//   }
-// });
-
-// client.connect();
-
-// client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
-//   if (err) throw err;
-//   for (let row of res.rows) {
-//     console.log(JSON.stringify(row));
-//   }
-//   client.end();
-// });
 
 // Using sequelize 
 const db = require('./models/index.js');
@@ -134,9 +92,20 @@ function userFlow(sender_psid, received_message) {
     let response;
     if(user){
       console.log('existing user');
-      response = {
-        "text": `Welcome again ${user.name} from ${user.location}, this is your message: "${received_message.text}".`
+      var msgtxt = received_message.text.trim();
+      if(msgtxt === 'location'){
+        // call location handler
+        console.log('location handler is called');
+        locationHandler(sender_psid, received_message);
+      }else{
+        response = {
+          "text": `Welcome again ${user.name} from ${user.location}, this is your message: "${received_message.text}".`
+        }
+        // Send the response message
+        console.log(response);
+        callSendAPI(sender_psid, response);
       }
+      
     }else{
       console.log('new user');
       response = {
@@ -144,12 +113,33 @@ function userFlow(sender_psid, received_message) {
       }
       // Insert user registeration functions/logic here
       createUser(sender_psid, 'user'+ sender_psid, 'Earth');
+      // Send the response message
+      console.log(response);
+      callSendAPI(sender_psid, response);
     }
-
-    console.log(response);
-    // Send the response message
-    callSendAPI(sender_psid, response);
+    // console.log(response);
+    // // Send the response message
+    // callSendAPI(sender_psid, response);
   })
+}
+
+function getLocation(){
+  // Iterate over each entry - there may be multiple if batched
+  data.entry.forEach(function(entry) {
+    var pageID = entry.id;
+    var timeOfEvent = entry.time;
+
+    // Iterate over each messaging event
+    entry.messaging.forEach(function(event) {
+        if (event.message) {
+        receivedMessage(event);
+        } else {
+        console.log("Webhook received unknown event: ", event);
+        }
+    });
+    });
+
+    res.sendStatus(200);
 }
 
 function createUser(sender_psid, userName, userLocation) {
@@ -160,47 +150,47 @@ function createUser(sender_psid, userName, userLocation) {
 
 function handleMessage(sender_psid, received_message) {
   let response;
-  
+  userFlow(sender_psid, received_message);
   // Checks if the message contains text
-  if (received_message.text) {    
-    // Create the payload for a basic text message, which
-    // will be added to the body of our request to the Send API
+  // if (received_message.text) {    
+  //   // Create the payload for a basic text message, which
+  //   // will be added to the body of our request to the Send API
     
-    // check if user exists and continue message flow
-    userFlow(sender_psid, received_message);
+  //   // check if user exists and continue message flow
+  //   userFlow(sender_psid, received_message);
     
-  } else if (received_message.attachments) {
-    let response;
-    // Get the URL of the message attachment
-    let attachment_url = received_message.attachments[0].payload.url;
-    response = {
-      "attachment": {
-        "type": "template",
-        "payload": {
-          "template_type": "generic",
-          "elements": [{
-            "title": "Is this the right picture?",
-            "subtitle": "Tap a button to answer.",
-            "image_url": attachment_url,
-            "buttons": [
-              {
-                "type": "postback",
-                "title": "Yes!",
-                "payload": "yes",
-              },
-              {
-                "type": "postback",
-                "title": "No!",
-                "payload": "no",
-              }
-            ],
-          }]
-        }
-      }
-    }
-    // Send the response message
-    callSendAPI(sender_psid, response);
-  } 
+  // } else if (received_message.attachments) {
+  //   let response;
+  //   // Get the URL of the message attachment
+  //   let attachment_url = received_message.attachments[0].payload.url;
+  //   response = {
+  //     "attachment": {
+  //       "type": "template",
+  //       "payload": {
+  //         "template_type": "generic",
+  //         "elements": [{
+  //           "title": "Is this the right picture?",
+  //           "subtitle": "Tap a button to answer.",
+  //           "image_url": attachment_url,
+  //           "buttons": [
+  //             {
+  //               "type": "postback",
+  //               "title": "Yes!",
+  //               "payload": "yes",
+  //             },
+  //             {
+  //               "type": "postback",
+  //               "title": "No!",
+  //               "payload": "no",
+  //             }
+  //           ],
+  //         }]
+  //       }
+  //     }
+  //   }
+  //   // Send the response message
+  //   callSendAPI(sender_psid, response);
+  // } 
      
 }
 
@@ -244,37 +234,20 @@ function callSendAPI(sender_psid, response) {
   }); 
 }
 
-app.post('/webhook', function (req, res) {
-var data = req.body;
-
-// Make sure this is a page subscription
-if (data.object === 'page') {
-
-    // Iterate over each entry - there may be multiple if batched
-    data.entry.forEach(function(entry) {
-    var pageID = entry.id;
-    var timeOfEvent = entry.time;
-
-    // Iterate over each messaging event
-    entry.messaging.forEach(function(event) {
-        if (event.message) {
-        receivedMessage(event);
-        } else {
-        console.log("Webhook received unknown event: ", event);
-        }
-    });
-    });
-
-    res.sendStatus(200);
+function sendTextMessage(sender_psid, msg){
+  let response = { "text": msg };
+  // Send the message
+  console.log(response);
+  callSendAPI(sender_psid, response);
 }
-});
 
-function receivedMessage(event) {
-    var senderID = event.sender.id;
-    var recipientID = event.recipient.id;
-    var timeOfMessage = event.timestamp;
-    var message = event.message;
-    var messageId = message.mid;
+
+function locationHandler(senderId, eventmsg) {
+    var senderID = senderId;
+    // var recipientID = event.recipient.id;
+    // var timeOfMessage = event.timestamp;
+    var message = eventmsg;
+    // var messageId = message.mid;
     var messageText = message.text;
     var messageAttachments = message.attachments;
     if (messageText) {
@@ -284,7 +257,7 @@ function receivedMessage(event) {
 
         switch (messageText) { 
             case 'getstarted' :
-                sendTextMessage(senderID, msg);   
+                sendTextMessage(senderID, msg);   // function implemented 
             default:
                 sendTextMessage(senderID, msg);
         }
