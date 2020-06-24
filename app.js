@@ -160,6 +160,7 @@ function userFlow(sender_psid, received_message) {
       // Send the response message
       console.log(response);
       callSendAPI(sender_psid, response);
+      shopDisplay(sender_psid);
     }
     // console.log(response);
     // // Send the response message
