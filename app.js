@@ -242,50 +242,17 @@ function sendTextMessage(sender_psid, msg){
 }
 
 
-function locationHandler(senderId, eventmsg) {
-    var senderID = senderId;
-    // var recipientID = event.recipient.id;
-    // var timeOfMessage = event.timestamp;
-    var message = eventmsg;
-    // var messageId = message.mid;
-    var messageText = message.text;
-    var messageAttachments = message.attachments;
-    if (messageText) {
-        var msg = "Hi ,I'm LocationBot ,and I was created to echo back your latitude and longitude coordinates "+
-                  "You just need to send me your location  \n" + 
-                  "Using the send location button on messenger (only available on mobile devices) \n"
-
-        switch (messageText) { 
-            case 'getstarted' :
-                sendTextMessage(senderID, msg);   // function implemented 
-            default:
-                sendTextMessage(senderID, msg);
-        }
-
-    } else if (messageAttachments) {
-            var lat = null;
-            var long = null;
-            if(messageAttachments[0].payload.coordinates)
-            {
-                lat = messageAttachments[0].payload.coordinates.lat;
-                long = messageAttachments[0].payload.coordinates.long;
-            }
-            console.log('handleMEssage message:', JSON.stringify(message));
-    if (message.nlp && message.nlp.entities && message.nlp.entities.location && message.nlp.entities.location.find(g => g.confidence > 0.8 && g.suggested)){
-            const locationName = message.nlp.entities.location.find(loc => loc.confidence > 0.8 && loc.suggested);
-             if (locationName.value){
-           const locationNameEncoded = encodeURIComponent(locationName.value);
-           callGeocodingApi(locationNameEncoded, sender_psid, handleConfirmLocation);
-           }
-           return;
-           } else if (message.nlp && message.nlp.entities && message.nlp.entities.greetings && message.nlp.entities.greetings.find(g => g.confidence > 0.8 && g.value === 'true')){
-            handlePostback(sender_psid, {payload: GREETING});
-            return;
-           }
-            var msg = "lat : " + lat + " ,long : " + long + "\n";
-            sendTextMessage(senderID, msg);
-        }
-    }
+function handleLocation(sender_psid){
+  const askForLocationPayload = {
+    "text": "Where about do you live?",
+    "quick_replies":[
+      {
+        "content_type":"location"
+      }
+    ]
+  };
+  callSendAPI(sender_psid, askForLocationPayload);
+}
 
  function callGeocodingApi(address, sender_psid, callback){
   console.log('before calling geocoding api with address:', address);
