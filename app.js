@@ -242,7 +242,7 @@ function sendTextMessage(sender_psid, msg){
 }
 
 
-function handleLocation(sender_psid){
+function locationHandler(sender_psid){
   const askForLocationPayload = {
     "text": "Where about do you live?",
     "quick_replies":[
